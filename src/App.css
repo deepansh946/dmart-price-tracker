@@ -1,7 +1,7 @@
 .App {
   color: black;
   min-height: 100vh;
-  margin: 0 auto;
+  margin: 0;
   background: #f3f4f6;
 }
 
@@ -33,5 +33,8 @@ textarea:focus {
   background: #7c3aed !important;
   color: #fff !important;
   border: 1px solid #575a89 !important;
-  width: 10%;
+}
+
+textarea {
+  height: 6rem;
 }

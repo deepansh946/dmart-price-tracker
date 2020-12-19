@@ -1,16 +1,24 @@
 import { useState } from "react";
 import { Row, Col, Button } from "react-bootstrap";
+
 import "./App.css";
+import { requestPrice } from "./util/api";
 
 function App() {
   const [values, setValues] = useState({
     productLink: "",
     storeId: "",
-    token: "",
-    price: 0
+    token: ""
   });
 
-  const { productLink, storeId, token, price } = values;
+  const [prices, setPrices] = useState([
+    {
+      name: "Dummy product",
+      price: "0.00"
+    }
+  ]);
+
+  const { productLink, storeId, token } = values;
 
   const onChangeHandler = e => {
     const { name, value } = e.target;
@@ -20,11 +28,22 @@ function App() {
     });
   };
 
+  const submitHandler = async () => {
+    const linkSlugs = productLink.split("/");
+    const length = linkSlugs.length;
+    const slug = linkSlugs[length - 1];
+    const data = await requestPrice({ slug, token, storeId });
+
+    const prices = data.map(({ priceSALE: price, name }) => ({ name, price }));
+
+    setPrices(prices);
+  };
+
   return (
     <div className="App">
       <header className="App-header">Dmart Price Tracker</header>
-      <Row className="mt-5">
-        <Col md={5} className="text-right">
+      <Row className="p-4">
+        <Col md={5}>
           <h2>Product Link: </h2>
         </Col>
         <Col md={7}>
@@ -36,8 +55,8 @@ function App() {
           />
         </Col>
       </Row>
-      <Row className="mt-5">
-        <Col md={5} className="text-right">
+      <Row className="p-4">
+        <Col md={5}>
           <h2>Token: </h2>
         </Col>
         <Col md={7}>
@@ -49,26 +68,27 @@ function App() {
           />
         </Col>
       </Row>
-      <Row className="mt-5">
-        <Col md={5} className="text-right">
+      <Row className="p-4">
+        <Col md={5}>
           <h2>Store ID: </h2>
         </Col>
         <Col md={7}>
           <input name="storeId" value={storeId} onChange={onChangeHandler} />
         </Col>
       </Row>
-      <Row className="mt-5">
-        <Col md={5} className="text-right">
-          <h2>Price: </h2>
-        </Col>
-        <Col md={7}>
-          <input name="price" value={price} onChange={onChangeHandler} />
+      <Row>
+        <Col md={12} className="text-center">
+          <Button className="btn-light" onClick={submitHandler}>
+            Submit
+          </Button>
         </Col>
       </Row>
-      <Row className="mt-5">
-        <Col md={12} className="text-center">
-          <Button className="btn-light">Submit</Button>
-        </Col>
+      <Row className="mt-5 text-center">
+        {prices.map(({ name, price }) => (
+          <Col md={12}>
+            {name} has price Rs. {price}
+          </Col>
+        ))}
       </Row>
     </div>
   );
