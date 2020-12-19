@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Row, Col, Button } from "react-bootstrap";
+import { Row, Col, Button, Spinner } from "react-bootstrap";
 
 import "./App.css";
 import { requestPrice } from "./util/api";
@@ -10,13 +10,13 @@ function App() {
     storeId: "",
     token: ""
   });
-
   const [prices, setPrices] = useState([
     {
       name: "Dummy product",
       price: "0.00"
     }
   ]);
+  const [loading, setLoading] = useState(false);
 
   const { productLink, storeId, token } = values;
 
@@ -29,6 +29,7 @@ function App() {
   };
 
   const submitHandler = async () => {
+    setLoading(true);
     const linkSlugs = productLink.split("/");
     const length = linkSlugs.length;
     const slug = linkSlugs[length - 1];
@@ -37,6 +38,7 @@ function App() {
     const prices = data.map(({ priceSALE: price, name }) => ({ name, price }));
 
     setPrices(prices);
+    setLoading(false);
   };
 
   return (
@@ -78,14 +80,27 @@ function App() {
       </Row>
       <Row>
         <Col md={12} className="text-center">
-          <Button className="btn-light" onClick={submitHandler}>
-            Submit
-          </Button>
+          {loading ? (
+            <Spinner
+              animation="grow"
+              role="status"
+              style={{
+                color: "#7c3aed"
+              }}
+            />
+          ) : (
+            <Button className="btn-light" onClick={submitHandler}>
+              Submit
+            </Button>
+          )}
         </Col>
+      </Row>
+      <Row>
+        <Col md={12} className="text-center"></Col>
       </Row>
       <Row className="mt-5 text-center">
         {prices.map(({ name, price }) => (
-          <Col md={12}>
+          <Col md={12} key={price}>
             {name} has price Rs. {price}
           </Col>
         ))}

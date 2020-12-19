@@ -4,6 +4,8 @@ import axios from "axios";
 export const requestPrice = async ({ slug, token, storeId }) => {
   const url = API_URL + slug;
 
+  console.log(url);
+
   const {
     data: {
       dynamicPDP: {
