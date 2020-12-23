@@ -14,13 +14,11 @@
   height: 6rem;
   background: #7c3aed;
   color: white;
-  margin-bottom: 6rem;
 }
 
 input,
 textarea {
   border: 1px solid grey;
-  border-radius: 8px;
   margin-top: 5px;
 }
 

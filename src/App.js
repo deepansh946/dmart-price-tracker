@@ -1,24 +1,27 @@
 import { useState } from "react";
-import { Row, Col, Button, Spinner } from "react-bootstrap";
+import { Row, Col, Button, Spinner, ListGroup } from "react-bootstrap";
+import { writeStorage, useLocalStorage } from "@rehooks/local-storage";
 
 import "./App.css";
 import { requestPrice } from "./util/api";
 
+const capitalize = string => {
+  return string[0].toUpperCase() + string.slice(1).toLowerCase();
+};
+
 function App() {
+  const [localList] = useLocalStorage("list");
   const [values, setValues] = useState({
-    productLink: "",
     storeId: "",
     token: ""
   });
-  const [prices, setPrices] = useState([
-    {
-      name: "Dummy product",
-      price: "0.00"
-    }
-  ]);
+  const [listItem, setListItem] = useState("");
+  const [list, setList] = useState(localList || []);
+
+  const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const { productLink, storeId, token } = values;
+  const { storeId, token } = values;
 
   const onChangeHandler = e => {
     const { name, value } = e.target;
@@ -28,35 +31,41 @@ function App() {
     });
   };
 
+  const addHandler = () => {
+    const slug = listItem.split("/")[listItem.split("/").length - 1];
+    const nameList = slug.split("-");
+
+    const name = nameList.reduce(
+      (acc, curr) => acc + " " + capitalize(curr),
+      ""
+    );
+
+    const newList = [
+      ...list,
+      {
+        name,
+        slug
+      }
+    ];
+    setList(newList);
+    writeStorage("list", newList);
+    setListItem("");
+  };
+
   const submitHandler = async () => {
-    setLoading(true);
-    const linkSlugs = productLink.split("/");
-    const length = linkSlugs.length;
-    const slug = linkSlugs[length - 1];
-    const data = await requestPrice({ slug, token, storeId });
-
-    const prices = data.map(({ priceSALE: price, name }) => ({ name, price }));
-
-    setPrices(prices);
+    try {
+      setLoading(true);
+      const data = await requestPrice({ list, token, storeId });
+      setPrices(data);
+    } catch (err) {
+      alert("Something went wrong! Try after sometime.");
+    }
     setLoading(false);
   };
 
   return (
     <div className="App">
       <header className="App-header">Dmart Price Tracker</header>
-      <Row className="p-4">
-        <Col md={5}>
-          <h2>Product Link: </h2>
-        </Col>
-        <Col md={7}>
-          <input
-            className="w-75"
-            name="productLink"
-            value={productLink}
-            onChange={onChangeHandler}
-          />
-        </Col>
-      </Row>
       <Row className="p-4">
         <Col md={5}>
           <h2>Token: </h2>
@@ -78,6 +87,40 @@ function App() {
           <input name="storeId" value={storeId} onChange={onChangeHandler} />
         </Col>
       </Row>
+      <Row className="p-4 mx-auto">
+        <Col md={6}>
+          <h2>Product Link: </h2>
+          <input
+            className="w-100"
+            name="listItem"
+            value={listItem}
+            onChange={e => setListItem(e.target.value)}
+          />
+          <Button className="btn-light mt-4" onClick={addHandler}>
+            Add
+          </Button>
+        </Col>
+      </Row>
+      <Row className="p-4 mx-auto">
+        <Col md={12}>
+          <ListGroup className="">
+            {list.map(({ name, slug }) => (
+              <ListGroup.Item key={slug}>
+                {name}
+                {Object.keys(prices).length && prices[slug] ? (
+                  prices[slug].map(priceArr => (
+                    <div>
+                      {priceArr.name} has price {priceArr.price}
+                    </div>
+                  ))
+                ) : (
+                  <div />
+                )}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Col>
+      </Row>
       <Row>
         <Col md={12} className="text-center">
           {loading ? (
@@ -94,16 +137,6 @@ function App() {
             </Button>
           )}
         </Col>
-      </Row>
-      <Row>
-        <Col md={12} className="text-center"></Col>
-      </Row>
-      <Row className="mt-5 text-center">
-        {prices.map(({ name, price }) => (
-          <Col md={12} key={price}>
-            {name} has price Rs. {price}
-          </Col>
-        ))}
       </Row>
     </div>
   );
