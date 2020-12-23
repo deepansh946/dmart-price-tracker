@@ -11,25 +11,11 @@ const capitalize = string => {
 
 function App() {
   const [localList] = useLocalStorage("list");
-  const [values, setValues] = useState({
-    storeId: "",
-    token: ""
-  });
   const [listItem, setListItem] = useState("");
   const [list, setList] = useState(localList || []);
 
   const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(false);
-
-  const { storeId, token } = values;
-
-  const onChangeHandler = e => {
-    const { name, value } = e.target;
-    setValues({
-      ...values,
-      [name]: value
-    });
-  };
 
   const addHandler = () => {
     const slug = listItem.split("/")[listItem.split("/").length - 1];
@@ -55,7 +41,7 @@ function App() {
   const submitHandler = async () => {
     try {
       setLoading(true);
-      const data = await requestPrice({ list, token, storeId });
+      const data = await requestPrice({ list });
       setPrices(data);
     } catch (err) {
       alert("Something went wrong! Try after sometime.");
@@ -63,30 +49,13 @@ function App() {
     setLoading(false);
   };
 
+  console.log(prices);
+
+  const pinCodes = Object.keys(prices);
+
   return (
     <div className="App">
       <header className="App-header">Dmart Price Tracker</header>
-      <Row className="p-4">
-        <Col md={5}>
-          <h2>Token: </h2>
-        </Col>
-        <Col md={7}>
-          <textarea
-            className="w-75"
-            name="token"
-            value={token}
-            onChange={onChangeHandler}
-          />
-        </Col>
-      </Row>
-      <Row className="p-4">
-        <Col md={5}>
-          <h2>Store ID: </h2>
-        </Col>
-        <Col md={7}>
-          <input name="storeId" value={storeId} onChange={onChangeHandler} />
-        </Col>
-      </Row>
       <Row className="p-4 mx-auto">
         <Col md={6}>
           <h2>Product Link: </h2>
@@ -105,18 +74,7 @@ function App() {
         <Col md={12}>
           <ListGroup className="">
             {list.map(({ name, slug }) => (
-              <ListGroup.Item key={slug}>
-                {name}
-                {Object.keys(prices).length && prices[slug] ? (
-                  prices[slug].map(priceArr => (
-                    <div>
-                      {priceArr.name} has price {priceArr.price}
-                    </div>
-                  ))
-                ) : (
-                  <div />
-                )}
-              </ListGroup.Item>
+              <ListGroup.Item key={slug}>{name}</ListGroup.Item>
             ))}
           </ListGroup>
         </Col>
@@ -138,6 +96,30 @@ function App() {
           )}
         </Col>
       </Row>
+      {pinCodes.length ? (
+        pinCodes.map(pin => (
+          <Row className="p-4 mx-auto">
+            <Col md={12}>
+              <strong>PIN: {pin}</strong>
+              {Object.values(prices[pin]).map((productsArr, index) => (
+                <ListGroup key={pin + index}>
+                  <ListGroup.Item key={pin + index}>
+                    {productsArr.map(product => {
+                      return (
+                        <div>
+                          {product.name} has price {product.price}
+                        </div>
+                      );
+                    })}
+                  </ListGroup.Item>
+                </ListGroup>
+              ))}
+            </Col>
+          </Row>
+        ))
+      ) : (
+        <div />
+      )}
     </div>
   );
 }

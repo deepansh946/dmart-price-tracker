@@ -1,37 +1,44 @@
-import { API_URL } from "../resources/constants";
+import { API_URL, PIN_CODES } from "../resources/constants";
 import axios from "axios";
 
-export const requestPrice = async ({ list, token, storeId }) => {
+export const requestPrice = async ({ list }) => {
   try {
-    let prices = {};
+    let pricesWithPincodes = {};
+    for (const { storeId, code } of PIN_CODES) {
+      let prices = {};
 
-    for (const { slug } of list) {
-      const url = API_URL + slug;
-
-      const {
-        data: {
-          dynamicPDP: {
-            data: {
-              productData: { sKUs }
+      for (const { slug } of list) {
+        const url = API_URL + slug;
+        const {
+          data: {
+            dynamicPDP: {
+              data: {
+                productData: { sKUs }
+              }
             }
           }
-        }
-      } = await axios.get(url, {
-        headers: {
-          dm_token: token,
-          storeId
-        }
-      });
+        } = await axios.get(url, {
+          headers: {
+            storeId
+          }
+        });
+        const data = sKUs.map(({ priceSALE: price, name }) => ({
+          name,
+          price
+        }));
+        prices = {
+          ...prices,
+          [slug]: data
+        };
+      }
 
-      const data = sKUs.map(({ priceSALE: price, name }) => ({ name, price }));
-
-      prices = {
-        ...prices,
-        [slug]: data
+      pricesWithPincodes = {
+        ...pricesWithPincodes,
+        [code]: prices
       };
     }
 
-    return prices;
+    return pricesWithPincodes;
   } catch (err) {
     throw err;
   }
