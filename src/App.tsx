@@ -1,23 +1,35 @@
-import { useState } from "react";
+import { useState, MouseEvent, FormEvent } from "react";
 import { Row, Col, Button, Spinner, ListGroup } from "react-bootstrap";
 import { writeStorage, useLocalStorage } from "@rehooks/local-storage";
 
 import "./App.css";
 import { requestPrice } from "./util/api";
+import { PriceItem, PriceArr, ListItem } from "./types";
 
-const capitalize = string => {
+const capitalize = (string: any) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase();
 };
 
-function App() {
-  const [localList] = useLocalStorage("list");
-  const [listItem, setListItem] = useState("");
-  const [list, setList] = useState(localList || []);
+const DEFAULT_PRICES = {
+  400029: {
+    "Dummy product": [
+      {
+        name: "Test Product - 16 Pieces : 200 gms",
+        price: "460.00",
+      },
+    ],
+  },
+};
 
-  const [prices, setPrices] = useState({});
+const App = (): JSX.Element => {
+  const [localList = []] = useLocalStorage("list");
+  const [listItem, setListItem] = useState<string>("");
+  const [list, setList] = useState<ListItem[]>(localList);
+
+  const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES);
   const [loading, setLoading] = useState(false);
 
-  const addHandler = () => {
+  const addHandler: () => void = () => {
     const slug = listItem.split("/")[listItem.split("/").length - 1];
     const nameList = slug.split("-");
 
@@ -30,15 +42,15 @@ function App() {
       ...list,
       {
         name,
-        slug
-      }
+        slug,
+      },
     ];
     setList(newList);
     writeStorage("list", newList);
     setListItem("");
   };
 
-  const submitHandler = async () => {
+  const submitHandler: () => void = async () => {
     try {
       setLoading(true);
       const data = await requestPrice({ list });
@@ -48,8 +60,6 @@ function App() {
     }
     setLoading(false);
   };
-
-  console.log(prices);
 
   const pinCodes = Object.keys(prices);
 
@@ -63,22 +73,26 @@ function App() {
             className="w-100"
             name="listItem"
             value={listItem}
-            onChange={e => setListItem(e.target.value)}
+            onChange={(e: FormEvent<HTMLInputElement>) =>
+              setListItem((e.target as HTMLInputElement).value)
+            }
           />
           <Button className="btn-light mt-4" onClick={addHandler}>
             Add
           </Button>
         </Col>
       </Row>
-      <Row className="p-4 mx-auto">
-        <Col md={12}>
-          <ListGroup className="">
-            {list.map(({ name, slug }) => (
-              <ListGroup.Item key={slug}>{name}</ListGroup.Item>
-            ))}
-          </ListGroup>
-        </Col>
-      </Row>
+      {list?.length && (
+        <Row className="p-4 mx-auto">
+          <Col md={12}>
+            <ListGroup className="">
+              {list.map(({ name, slug }: ListItem) => (
+                <ListGroup.Item key={slug}>{name}</ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Col>
+        </Row>
+      )}
       <Row>
         <Col md={12} className="text-center">
           {loading ? (
@@ -86,7 +100,7 @@ function App() {
               animation="grow"
               role="status"
               style={{
-                color: "#7c3aed"
+                color: "#7c3aed",
               }}
             />
           ) : (
@@ -97,14 +111,14 @@ function App() {
         </Col>
       </Row>
       {pinCodes.length ? (
-        pinCodes.map(pin => (
+        pinCodes.map((pin: string) => (
           <Row className="p-4 mx-auto">
             <Col md={12}>
               <strong>PIN: {pin}</strong>
-              {Object.values(prices[pin]).map((productsArr, index) => (
+              {Object.values(prices[pin]).map((productsArr, index: number) => (
                 <ListGroup key={pin + index}>
                   <ListGroup.Item key={pin + index}>
-                    {productsArr.map(product => {
+                    {productsArr.map((product: PriceItem) => {
                       return (
                         <div>
                           {product.name} has price {product.price}
@@ -122,6 +136,6 @@ function App() {
       )}
     </div>
   );
-}
+};
 
 export default App;

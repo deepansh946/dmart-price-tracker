@@ -1,5 +1,6 @@
 import { API_URL, PIN_CODES } from "../resources/constants";
 import axios from "axios";
+import { PriceArr, PriceItem, ListItem} from '../types'
 
 export const requestPrice = async ({ list }) => {
   try {
@@ -7,7 +8,7 @@ export const requestPrice = async ({ list }) => {
     for (const { storeId, code } of PIN_CODES) {
       let prices = {};
 
-      for (const { slug } of list) {
+      for (const { slug } of list ) {
         const url = API_URL + slug;
         const {
           data: {
