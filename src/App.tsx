@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { Row, Col, Button, Spinner, ListGroup } from "react-bootstrap";
 import { writeStorage, useLocalStorage } from "@rehooks/local-storage";
 
@@ -21,13 +21,20 @@ const DEFAULT_PRICES = {
   },
 };
 
+const DEFAULT_LIST = [
+  {
+    name: "Dummy Product",
+    slug: "dummy-product",
+  },
+];
+
 const App = (): JSX.Element => {
-  const [localList = []] = useLocalStorage("list");
+  const [localList] = useLocalStorage<ListItem[]>("list", DEFAULT_LIST);
   const [listItem, setListItem] = useState<string>("");
   const [list, setList] = useState<ListItem[]>(localList);
 
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const addHandler: () => void = () => {
     const slug = listItem.split("/")[listItem.split("/").length - 1];
@@ -38,7 +45,7 @@ const App = (): JSX.Element => {
       ""
     );
 
-    const newList = [
+    const newList: ListItem[] = [
       ...list,
       {
         name,
@@ -53,7 +60,7 @@ const App = (): JSX.Element => {
   const submitHandler: () => void = async () => {
     try {
       setLoading(true);
-      const data = await requestPrice({ list });
+      const data = await requestPrice(list);
       setPrices(data);
     } catch (err) {
       alert("Something went wrong! Try after sometime.");
@@ -111,23 +118,25 @@ const App = (): JSX.Element => {
         </Col>
       </Row>
       {pinCodes.length ? (
-        pinCodes.map((pin: string) => (
-          <Row className="p-4 mx-auto">
+        pinCodes.map((pinCode: string) => (
+          <Row className="p-4 mx-auto" key={pinCode}>
             <Col md={12}>
-              <strong>PIN: {pin}</strong>
-              {Object.values(prices[pin]).map((productsArr, index: number) => (
-                <ListGroup key={pin + index}>
-                  <ListGroup.Item key={pin + index}>
-                    {productsArr.map((product: PriceItem) => {
-                      return (
-                        <div>
-                          {product.name} has price {product.price}
-                        </div>
-                      );
-                    })}
-                  </ListGroup.Item>
-                </ListGroup>
-              ))}
+              <strong>PIN: {pinCode}</strong>
+              {Object.values(prices[pinCode as keyof PriceArr]).map(
+                (productsArr: PriceItem[], index: number) => (
+                  <ListGroup key={pinCode + index}>
+                    <ListGroup.Item key={pinCode + index + 1}>
+                      {productsArr.map((product: PriceItem, i: number) => {
+                        return (
+                          <div key={i}>
+                            {product.name} has price {product.price}
+                          </div>
+                        );
+                      })}
+                    </ListGroup.Item>
+                  </ListGroup>
+                )
+              )}
             </Col>
           </Row>
         ))
