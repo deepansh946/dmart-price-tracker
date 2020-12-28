@@ -1,8 +1,8 @@
 import { API_URL, PIN_CODES } from "../resources/constants";
 import axios from "axios";
-import { ListItem, DmartAPIRes } from "../types";
+import { ListItem, DmartAPIRes, PriceArr } from "../types";
 
-export const requestPrice = async (list: ListItem[]) => {
+export const requestPrice = async (list: ListItem[]): Promise<PriceArr> => {
   try {
     let pricesWithPincodes = {};
     for (const { storeId, code } of PIN_CODES) {
