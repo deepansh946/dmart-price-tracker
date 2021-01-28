@@ -23,8 +23,8 @@ const DEFAULT_PRICES = {
 
 const DEFAULT_LIST = [
   {
-    name: "Dummy Product",
-    slug: "dummy-product",
+    name: "Premia Sugar",
+    slug: "premia-sugar",
   },
 ];
 
