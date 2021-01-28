@@ -6,7 +6,7 @@ import "./App.css";
 import { requestPrice } from "./util/api";
 import { PriceItem, PriceArr, ListItem } from "./types";
 
-const capitalize = (string: any) => {
+const capitalize = (string: string) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase();
 };
 
@@ -41,7 +41,7 @@ const App = (): JSX.Element => {
     const nameList = slug.split("-");
 
     const name = nameList.reduce(
-      (acc, curr) => acc + " " + capitalize(curr),
+      (acc, curr) => acc + " " + (curr.length ? capitalize(curr) : ""),
       ""
     );
 
@@ -52,6 +52,13 @@ const App = (): JSX.Element => {
         slug,
       },
     ];
+    setList(newList);
+    writeStorage("list", newList);
+    setListItem("");
+  };
+
+  const clearHandler: () => void = () => {
+    const newList: ListItem[] = DEFAULT_LIST
     setList(newList);
     writeStorage("list", newList);
     setListItem("");
@@ -86,6 +93,9 @@ const App = (): JSX.Element => {
           />
           <Button className="btn-light mt-4" onClick={addHandler}>
             Add
+          </Button>
+          <Button className="btn-light mt-4 ml-2" onClick={clearHandler}>
+            Clear All
           </Button>
         </Col>
       </Row>
