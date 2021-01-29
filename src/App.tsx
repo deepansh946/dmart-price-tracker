@@ -1,11 +1,13 @@
 import { useState, FormEvent } from 'react'
 import { Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
+import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import './App.css'
 import { requestPrice } from './util/api'
 import { PriceItem, PriceArr, ListItem } from './types'
+import AddCartModal from './components/AddCartModal'
 
 const capitalize = (string: string) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase()
@@ -24,11 +26,14 @@ const DEFAULT_PRICES = {
 
 const App = (): JSX.Element => {
   const [localList] = useLocalStorage<ListItem[]>('list', [])
+  const [localCart] = useLocalStorage<[]>('cart', [])
+  const [carts, setCarts] = useState(localCart)
   const [listItem, setListItem] = useState<string>('')
   const [list, setList] = useState<ListItem[]>(localList)
 
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
   const [loading, setLoading] = useState<boolean>(false)
+  const [show, setShow] = useState<boolean>(false)
 
   const addHandler: () => void = () => {
     if (listItem.length) {
@@ -73,6 +78,10 @@ const App = (): JSX.Element => {
     setLoading(false)
   }
 
+  const addCart: () => void = () => {
+    console.log('add cart')
+  }
+
   const deleteHandler: (arg0: string) => void = (slug: string) => {
     const updatedList = list.filter(item => item.slug !== slug)
     setList(updatedList)
@@ -84,6 +93,17 @@ const App = (): JSX.Element => {
   return (
     <div className="App">
       <header className="App-header">Dmart Price Tracker</header>
+      <Row className="p-4 mx-auto">
+        <Col md={12}>
+          <div className="d-flex align-items-center">
+            <h4>Carts </h4>
+            <AddIcon className="ml-2" onClick={addCart} />
+          </div>
+          {carts.map(cart => (
+            <div>{cart}</div>
+          ))}
+        </Col>
+      </Row>
       <Row className="p-4 mx-auto">
         <Col md={6}>
           <h2>Product Link: </h2>
@@ -103,29 +123,35 @@ const App = (): JSX.Element => {
           </Button>
         </Col>
       </Row>
-      {list?.length ? (
-        <Row className="p-4 mx-auto">
-          <Col md={12}>
-            <ListGroup className="">
-              {list.map(({ name, slug }: ListItem) => (
-                <ListGroup.Item
-                  key={slug}
-                  className="d-flex justify-content-between"
-                >
-                  <div>{name}</div>
-                  <DeleteIcon onClick={() => deleteHandler(slug)} />
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </Col>
-        </Row>
-      ) : (
-        <Row>
-          <Col md={12} className="ml-5">
-            No products found!
-          </Col>
-        </Row>
-      )}
+      <Row
+        className="p-4 mx-auto"
+        style={{
+          display: list.length ? '' : 'none',
+        }}
+      >
+        <Col md={12}>
+          <ListGroup className="">
+            {list.map(({ name, slug }: ListItem) => (
+              <ListGroup.Item
+                key={slug}
+                className="d-flex justify-content-between"
+              >
+                <div>{name}</div>
+                <DeleteIcon onClick={() => deleteHandler(slug)} />
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Col>
+      </Row>
+      <Row
+        style={{
+          display: list.length ? 'none' : '',
+        }}
+      >
+        <Col md={12} className="ml-5">
+          No products found!
+        </Col>
+      </Row>
       <Row>
         <Col md={12} className="text-center">
           {loading ? (
@@ -137,7 +163,11 @@ const App = (): JSX.Element => {
               }}
             />
           ) : (
-            <Button className="btn-light" onClick={submitHandler}>
+            <Button
+              disabled={list.length === 0}
+              className="btn-light"
+              onClick={submitHandler}
+            >
               Submit
             </Button>
           )}
@@ -169,6 +199,11 @@ const App = (): JSX.Element => {
       ) : (
         <div />
       )}
+      {/* <AddCartModal
+        show={show}
+        setModal={setShow}
+        onConfirm={(text) => console.log(text)}
+      /> */}
     </div>
   )
 }
