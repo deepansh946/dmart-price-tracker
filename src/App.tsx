@@ -8,6 +8,7 @@ import './App.css'
 import { requestPrice } from './util/api'
 import { PriceItem, PriceArr, ListItem } from './types'
 import AddCartModal from './components/AddCartModal'
+import Footer from './components/Footer'
 
 const capitalize = (string: string) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase()
@@ -93,112 +94,120 @@ const App = (): JSX.Element => {
   return (
     <div className="App">
       <header className="App-header">Dmart Price Tracker</header>
-      <Row className="p-4 mx-auto">
-        <Col md={12}>
-          <div className="d-flex align-items-center">
-            <h4>Carts </h4>
-            <AddIcon className="ml-2" onClick={addCart} />
-          </div>
-          {carts.map(cart => (
-            <div>{cart}</div>
-          ))}
-        </Col>
-      </Row>
-      <Row className="p-4 mx-auto">
-        <Col md={6}>
-          <h2>Product Link: </h2>
-          <input
-            className="w-100"
-            name="listItem"
-            value={listItem}
-            onChange={(e: FormEvent<HTMLInputElement>) =>
-              setListItem((e.target as HTMLInputElement).value)
-            }
-          />
-          <Button className="btn-light mt-4" onClick={addHandler}>
-            Add
-          </Button>
-          <Button className="btn-light mt-4 ml-2" onClick={clearHandler}>
-            Clear All
-          </Button>
-        </Col>
-      </Row>
-      <Row
-        className="p-4 mx-auto"
+      <div
+        className="overflow-auto"
         style={{
-          display: list.length ? '' : 'none',
+          height: '80vh',
         }}
       >
-        <Col md={12}>
-          <ListGroup className="">
-            {list.map(({ name, slug }: ListItem) => (
-              <ListGroup.Item
-                key={slug}
-                className="d-flex justify-content-between"
-              >
-                <div>{name}</div>
-                <DeleteIcon onClick={() => deleteHandler(slug)} />
-              </ListGroup.Item>
+        <Row className="p-4 mx-auto">
+          <Col md={12}>
+            <div className="d-flex align-items-center">
+              <h4>Carts </h4>
+              <AddIcon className="ml-2" onClick={addCart} />
+            </div>
+            {carts.map(cart => (
+              <div>{cart}</div>
             ))}
-          </ListGroup>
-        </Col>
-      </Row>
-      <Row
-        style={{
-          display: list.length ? 'none' : '',
-        }}
-      >
-        <Col md={12} className="ml-5">
-          No products found!
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12} className="text-center">
-          {loading ? (
-            <Spinner
-              animation="grow"
-              role="status"
-              style={{
-                color: '#7c3aed',
-              }}
+          </Col>
+        </Row>
+        <Row className="p-4 mx-auto">
+          <Col md={6}>
+            <h2>Product Link: </h2>
+            <input
+              className="w-100"
+              name="listItem"
+              value={listItem}
+              onChange={(e: FormEvent<HTMLInputElement>) =>
+                setListItem((e.target as HTMLInputElement).value)
+              }
             />
-          ) : (
-            <Button
-              disabled={list.length === 0}
-              className="btn-light"
-              onClick={submitHandler}
-            >
-              Submit
+            <Button className="btn-light mt-4" onClick={addHandler}>
+              Add
             </Button>
-          )}
-        </Col>
-      </Row>
-      {pinCodes.length ? (
-        pinCodes.map((pinCode: string) => (
-          <Row className="p-4 mx-auto" key={pinCode}>
-            <Col md={12}>
-              <strong>PIN: {pinCode}</strong>
-              {Object.values(prices[pinCode as keyof PriceArr]).map(
-                (productsArr: PriceItem[], index: number) => (
-                  <ListGroup key={pinCode + index}>
-                    <ListGroup.Item key={pinCode + index + 1}>
-                      {productsArr.map((product: PriceItem, i: number) => {
-                        return (
-                          <div key={i}>
-                            {product.name} has price {product.price}
-                          </div>
-                        )
-                      })}
-                    </ListGroup.Item>
-                  </ListGroup>
-                )
-              )}
-            </Col>
-          </Row>
-        ))
-      ) : (
-        <div />
-      )}
+            <Button className="btn-light mt-4 ml-2" onClick={clearHandler}>
+              Clear All
+            </Button>
+          </Col>
+        </Row>
+        <Row
+          className="p-4 mx-auto"
+          style={{
+            display: list.length ? '' : 'none',
+          }}
+        >
+          <Col md={12}>
+            <ListGroup className="">
+              {list.map(({ name, slug }: ListItem) => (
+                <ListGroup.Item
+                  key={slug}
+                  className="d-flex justify-content-between"
+                >
+                  <div>{name}</div>
+                  <DeleteIcon onClick={() => deleteHandler(slug)} />
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Col>
+        </Row>
+        <Row
+          style={{
+            display: list.length ? 'none' : '',
+          }}
+        >
+          <Col md={12} className="ml-5">
+            No products found!
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12} className="text-center">
+            {loading ? (
+              <Spinner
+                animation="grow"
+                role="status"
+                style={{
+                  color: '#7c3aed',
+                }}
+              />
+            ) : (
+              <Button
+                disabled={list.length === 0}
+                className="btn-light"
+                onClick={submitHandler}
+              >
+                Submit
+              </Button>
+            )}
+          </Col>
+        </Row>
+        {pinCodes.length ? (
+          pinCodes.map((pinCode: string) => (
+            <Row className="p-4 mx-auto" key={pinCode}>
+              <Col md={12}>
+                <strong>PIN: {pinCode}</strong>
+                {Object.values(prices[pinCode as keyof PriceArr]).map(
+                  (productsArr: PriceItem[], index: number) => (
+                    <ListGroup key={pinCode + index}>
+                      <ListGroup.Item key={pinCode + index + 1}>
+                        {productsArr.map((product: PriceItem, i: number) => {
+                          return (
+                            <div key={i}>
+                              {product.name} has price {product.price}
+                            </div>
+                          )
+                        })}
+                      </ListGroup.Item>
+                    </ListGroup>
+                  )
+                )}
+              </Col>
+            </Row>
+          ))
+        ) : (
+          <div />
+        )}
+      </div>
+      <Footer />
       {/* <AddCartModal
         show={show}
         setModal={setShow}
