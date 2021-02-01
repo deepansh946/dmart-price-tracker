@@ -46,3 +46,15 @@ textarea {
   text-align: center;
   bottom: 0;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.font-18 {
+  font-size: 18px !important;
+}
+
+a:hover {
+  text-decoration: none !important;
+}

@@ -1,15 +1,15 @@
-import { API_URL, PIN_CODES } from "../resources/constants";
-import axios from "axios";
-import { ListItem, DmartAPIRes, PriceArr } from "../types";
+import { API_URL, PIN_CODES } from '../resources/constants'
+import axios from 'axios'
+import { DmartAPIRes, PriceArr, Item } from '../types'
 
-export const requestPrice = async (list: ListItem[]): Promise<PriceArr> => {
+export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
   try {
-    let pricesWithPincodes = {};
+    let pricesWithPincodes = {}
     for (const { storeId, code } of PIN_CODES) {
-      let prices = {};
+      let prices = {}
 
       for (const { slug } of list) {
-        const url = API_URL + slug;
+        const url = API_URL + slug
         const {
           data: {
             dynamicPDP: {
@@ -22,25 +22,25 @@ export const requestPrice = async (list: ListItem[]): Promise<PriceArr> => {
           headers: {
             storeId,
           },
-        });
+        })
         const data = sKUs.map(({ priceSALE: price, name }: DmartAPIRes) => ({
           name,
           price,
-        }));
+        }))
         prices = {
           ...prices,
           [slug]: data,
-        };
+        }
       }
 
       pricesWithPincodes = {
         ...pricesWithPincodes,
         [code]: prices,
-      };
+      }
     }
 
-    return pricesWithPincodes;
+    return pricesWithPincodes
   } catch (err) {
-    throw err;
+    throw err
   }
-};
+}
