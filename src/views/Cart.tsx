@@ -6,7 +6,6 @@ import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
 import { requestPrice } from '../util/api'
 import { CartProps } from '../types'
 import { PriceItem, PriceArr, ListItem, getKeyValue, Item } from '../types'
-import { stringify } from 'querystring'
 
 const capitalize = (string: string) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase()
@@ -178,24 +177,25 @@ function Cart(props: CartProps) {
         pinCodes.map((pinCode: string) => (
           <Row className="p-4 mx-auto" key={pinCode}>
             <Col md={12}>
-              <b>PIN: {pinCode}</b>
               <table className="table w-100 table-bordered">
                 <thead>
                   <tr>
+                    <th>Pin Code</th>
                     <th>Name</th>
                     <th>Price</th>
                   </tr>
                 </thead>
                 {Object.values(prices[pinCode as keyof PriceArr]).map(
                   (productsArr: PriceItem[], index: number) => (
-                    <tbody>
+                    <tbody key={`body_${index + 1}`}>
                       {productsArr.map((product: PriceItem, i: number) => {
                         return (
-                          <tr key={pinCode + index + product.name.length}>
-                            <td key={pinCode + index + 1}>
+                          <tr>
+                            <td key={`pin_${index + 1}`}>{pinCode}</td>
+                            <td key={`name_${index + 1}`}>
                               <div key={i}>{product.name}</div>
                             </td>
-                            <td> {product.price}</td>
+                            <td key={`price_${index + 1}`}> {product.price}</td>
                           </tr>
                         )
                       })}
