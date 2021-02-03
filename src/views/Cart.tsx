@@ -64,7 +64,8 @@ function Cart(props: CartProps) {
       setList(newList)
       writeStorage('list', newList)
     }
-  }, [text, cart, list])
+    // eslint-disable-next-line
+  }, [text])
 
   const submitHandler: () => void = async () => {
     try {
