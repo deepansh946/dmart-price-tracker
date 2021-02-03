@@ -44,3 +44,8 @@ export interface Item {
   name: string
   slug: string
 }
+
+export interface ButtonInterface
+  extends React.MouseEvent<HTMLElement, MouseEvent> {
+  target: EventTarget
+}

@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
 import DeleteIcon from '@material-ui/icons/Delete'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
@@ -34,6 +34,37 @@ function Cart(props: CartProps) {
   const [listItem, setListItem] = useState<string>('')
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
+  const [text, setText] = useState<string>()
+
+  useEffect(() => {
+    if (text) {
+      const producstArr = text.split(' ')[0].split('\n')
+      const productsList = producstArr.map(product => {
+        const slug = product.split('/')[product.split('/').length - 1]
+        const nameList = slug.split('-')
+
+        const name = nameList.reduce(
+          (acc, curr) => acc + ' ' + (curr.length ? capitalize(curr) : ''),
+          ''
+        )
+
+        return {
+          name,
+          slug,
+        }
+      })
+
+      const newList = {
+        ...list,
+        [cart]: [
+          ...(getKeyValue(list, cart) ? getKeyValue(list, cart) : []),
+          ...productsList,
+        ],
+      }
+      setList(newList)
+      writeStorage('list', newList)
+    }
+  }, [text, cart, list])
 
   const submitHandler: () => void = async () => {
     try {
@@ -95,6 +126,10 @@ function Cart(props: CartProps) {
     setListItem('')
   }
 
+  const importHandler = () => {
+    document.getElementById('hiddenFileInput')?.click()
+  }
+
   const pinCodes = Object.keys(prices)
   return (
     <div>
@@ -118,6 +153,30 @@ function Cart(props: CartProps) {
           <Button className="btn-light mt-4 ml-2" onClick={clearHandler}>
             Clear All
           </Button>
+          <Button
+            className="btn-light mt-4 ml-2"
+            onClick={() => importHandler()}
+          >
+            Import
+          </Button>
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            accept=".txt"
+            id="hiddenFileInput"
+            onChange={e => {
+              const reader = new FileReader()
+              reader.onload = async e => {
+                if (e.target?.result) {
+                  const text = e.target.result
+                  setText(text + '')
+                }
+              }
+              const target = e.target as HTMLInputElement
+              const file: File = (target.files as FileList)[0]
+              reader.readAsText(file)
+            }}
+          />
         </Col>
       </Row>
       <Row

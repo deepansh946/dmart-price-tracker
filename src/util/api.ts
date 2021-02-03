@@ -22,14 +22,20 @@ export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
           headers: {
             storeId,
           },
+          params: {
+            channel: 'web',
+            profile: 'details',
+          },
         })
-        const data = sKUs.map(({ priceSALE: price, name }: DmartAPIRes) => ({
-          name,
-          price,
-        }))
-        prices = {
-          ...prices,
-          [slug]: data,
+        if (sKUs) {
+          const data = sKUs.map(({ priceSALE: price, name }: DmartAPIRes) => ({
+            name,
+            price,
+          }))
+          prices = {
+            ...prices,
+            [slug]: data,
+          }
         }
       }
 
