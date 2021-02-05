@@ -36,7 +36,19 @@ function Cart(props: CartProps) {
   const [text, setText] = useState<string>()
 
   const exportTableToExcel = (tableID: string) => {
-    TableExport(document.getElementsByTagName('table'))
+    const selector = document.querySelectorAll('#price-table')
+    new TableExport.TableExport(selector, {
+      headers: true,
+      footers: true,
+      formats: ['xlsx', 'csv', 'txt'],
+      filename: 'id',
+      bootstrap: false,
+      exportButtons: true,
+      position: 'right',
+      trimWhitespace: true,
+      RTL: false,
+      sheetname: 'id',
+    })
   }
 
   useEffect(() => {
