@@ -15,6 +15,7 @@
     "@types/react-dom": "^16.9.8",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "husky": "^4.3.8",
     "jquery": "^3.5.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
@@ -48,6 +49,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn build"
+    }
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.1.7"
