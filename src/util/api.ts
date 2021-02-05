@@ -1,6 +1,6 @@
 import { API_URL, PIN_CODES } from '../resources/constants'
 import axios from 'axios'
-import { DmartAPIRes, PriceArr, Item } from '../types'
+import { DmartAPIRes, PriceArr, Item, getKeyValue } from '../types'
 
 export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
   try {
@@ -45,7 +45,35 @@ export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
       }
     }
 
-    return pricesWithPincodes
+    let excelFormat = {} as any
+
+    const pinCodes = Object.keys(pricesWithPincodes)
+
+    const temp = Object.values(pricesWithPincodes)
+
+    temp.forEach((obj: any, index: number) => {
+      const keys = Object.values(obj)
+      keys.forEach((key: any) => {
+        key.forEach((ob: any) => {
+          const { name, price } = ob
+
+          excelFormat = {
+            ...excelFormat,
+            [name]: [
+              ...(getKeyValue(excelFormat, name)
+                ? getKeyValue(excelFormat, name)
+                : []),
+              {
+                pin: pinCodes[index],
+                price,
+              },
+            ],
+          }
+        })
+      })
+    })
+
+    return excelFormat
   } catch (err) {
     throw err
   }

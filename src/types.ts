@@ -10,14 +10,17 @@ export type PriceItem = {
   price: string
 }
 
+type Price = {
+  pin: string
+  price: string
+}
+
 export type PincodesArr = {
   pin: string
 }
 
 export type PriceArr = {
-  [pinCode: string]: {
-    [product: string]: PriceItem[]
-  }
+  [name: string]: Price[]
 }
 
 export interface DmartAPIRes {

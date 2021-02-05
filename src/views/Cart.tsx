@@ -4,22 +4,20 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
 
 import { requestPrice } from '../util/api'
-import { CartProps } from '../types'
-import { PriceItem, PriceArr, ListItem, getKeyValue, Item } from '../types'
+import { CartProps, ListItem, getKeyValue, Item, PriceArr } from '../types'
+import { PINS } from '../resources/constants'
 
 const capitalize = (string: string) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase()
 }
 
 const DEFAULT_PRICES = {
-  400029: {
-    'Dummy product': [
-      {
-        name: 'Test Product - 16 Pieces : 200 gms',
-        price: '460.00',
-      },
-    ],
-  },
+  'Dummy Product': [
+    {
+      pin: '400100',
+      price: '460.00',
+    },
+  ],
 }
 
 function Cart(props: CartProps) {
@@ -131,7 +129,10 @@ function Cart(props: CartProps) {
     document.getElementById('hiddenFileInput')?.click()
   }
 
-  const pinCodes = Object.keys(prices)
+  const names = Object.keys(prices)
+  const pinPrices = Object.values(prices)
+  const totalLen = PINS.length
+
   return (
     <div>
       <div className="my-3 text-center">
@@ -233,42 +234,31 @@ function Cart(props: CartProps) {
           )}
         </Col>
       </Row>
-      {pinCodes.length ? (
-        pinCodes.map((pinCode: string) => (
-          <Row className="p-4 mx-auto" key={pinCode}>
-            <Col md={12}>
-              <table className="table w-100 table-bordered">
-                <thead>
-                  <tr>
-                    <th>Pin Code</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                {Object.values(prices[pinCode as keyof PriceArr]).map(
-                  (productsArr: PriceItem[], index: number) => (
-                    <tbody key={`body_${index + 1}`}>
-                      {productsArr.map((product: PriceItem, i: number) => {
-                        return (
-                          <tr>
-                            <td key={`pin_${index + 1}`}>{pinCode}</td>
-                            <td key={`name_${index + 1}`}>
-                              <div key={i}>{product.name}</div>
-                            </td>
-                            <td key={`price_${index + 1}`}> {product.price}</td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
+      <div className="p-4">
+        <table className="table table-striped">
+          <thead>
+            <th>Name</th>
+            {PINS.map(code => (
+              <th>{code}</th>
+            ))}
+          </thead>
+          <tbody>
+            {names.map((name, i) => (
+              <tr>
+                <td>{name}</td>
+                {pinPrices[i].map(({ price }) => {
+                  return <td>{price}</td>
+                })}
+                {Array.from({ length: totalLen - pinPrices[i].length }).map(
+                  _ => (
+                    <td>NA</td>
                   )
                 )}
-              </table>
-            </Col>
-          </Row>
-        ))
-      ) : (
-        <div />
-      )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

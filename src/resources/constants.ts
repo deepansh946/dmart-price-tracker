@@ -44,3 +44,15 @@ export const SOCIAL_LINKS = [
   'https://www.linkedin.com/in/deepansh946/',
   'https://twitter.com/deepansh946',
 ]
+
+export const PINS = [
+  '400029',
+  '400070',
+  '400092',
+  '400601',
+  '410210',
+  '411007',
+  '411019',
+  '411040',
+  '411048',
+]
