@@ -1,4 +1,5 @@
 import { useState, FormEvent, useEffect } from 'react'
+import TableExport from 'tableexport'
 import { Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
 import DeleteIcon from '@material-ui/icons/Delete'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
@@ -33,6 +34,10 @@ function Cart(props: CartProps) {
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
   const [text, setText] = useState<string>()
+
+  const exportTableToExcel = (tableID: string) => {
+    TableExport(document.getElementsByTagName('table'))
+  }
 
   useEffect(() => {
     if (text) {
@@ -234,13 +239,22 @@ function Cart(props: CartProps) {
           )}
         </Col>
       </Row>
+
+      <button
+        className="btn-light"
+        onClick={() => exportTableToExcel('price-table')}
+      >
+        Export to Excel
+      </button>
       <div className="p-4">
-        <table className="table table-striped">
+        <table className="table table-striped" id="price-table">
           <thead>
-            <th>Name</th>
-            {PINS.map(code => (
-              <th>{code}</th>
-            ))}
+            <tr>
+              <th>Name</th>
+              {PINS.map(code => (
+                <th>{code}</th>
+              ))}
+            </tr>
           </thead>
           <tbody>
             {names.map((name, i) => (
