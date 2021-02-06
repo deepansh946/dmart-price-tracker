@@ -58,3 +58,7 @@ textarea {
 a:hover {
   text-decoration: none !important;
 }
+
+.tableexport-caption {
+  display: none;
+}

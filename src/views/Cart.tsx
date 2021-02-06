@@ -35,20 +35,28 @@ function Cart(props: CartProps) {
   const [loading, setLoading] = useState<boolean>(false)
   const [text, setText] = useState<string>()
 
-  const exportTableToExcel = (tableID: string) => {
-    const selector = document.querySelectorAll('#price-table')
-    new TableExport.TableExport(selector, {
+  const exportTableToExcel = () => {
+    const selector = document.querySelectorAll('#priceTable')
+    const table = new TableExport.TableExport(selector, {
       headers: true,
       footers: true,
-      formats: ['xlsx', 'csv', 'txt'],
-      filename: 'id',
+      formats: ['xlsx'],
+      filename: cart,
       bootstrap: false,
       exportButtons: true,
-      position: 'right',
+      position: 'top',
       trimWhitespace: true,
       RTL: false,
       sheetname: 'id',
     })
+    const exportData: any = table.getExportData()
+    const xlsxData = exportData.priceTable.xlsx // Replace with the kind of file you want from the exportData
+    table.export2file(
+      xlsxData.data,
+      xlsxData.mimeType,
+      xlsxData.filename,
+      xlsxData.fileExtension
+    )
   }
 
   useEffect(() => {
@@ -252,14 +260,21 @@ function Cart(props: CartProps) {
         </Col>
       </Row>
 
-      <button
-        className="btn-light"
-        onClick={() => exportTableToExcel('price-table')}
+      <div
+        className="text-right"
+        style={{
+          padding: '1rem 1rem 0rem 1rem',
+        }}
       >
-        Export to Excel
-      </button>
+        <Button
+          className="btn-light p-2 cursor-pointer"
+          onClick={() => exportTableToExcel()}
+        >
+          Export
+        </Button>
+      </div>
       <div className="p-4">
-        <table className="table table-striped" id="price-table">
+        <table className="table table-striped" id="priceTable">
           <thead>
             <tr>
               <th>Name</th>
