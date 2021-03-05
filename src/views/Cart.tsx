@@ -30,6 +30,7 @@ function Cart(props: CartProps) {
 
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
   const [localList] = useLocalStorage<ListItem>('list', {})
+  const [localPrices] = useLocalStorage<ListItem>('oldPrices', {})
   const [listItem, setListItem] = useState<string>('')
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
@@ -95,6 +96,9 @@ function Cart(props: CartProps) {
       setLoading(true)
       const data = await requestPrice(list[cart])
       setPrices(data)
+      if (!Object.keys(localPrices).length) {
+        writeStorage('oldPrices', data)
+      }
     } catch (err) {
       alert('Something went wrong! Try after sometime.')
     }
@@ -157,6 +161,7 @@ function Cart(props: CartProps) {
   const names = Object.keys(prices)
   const pinPrices = Object.values(prices)
   const totalLen = PINS.length
+  const oldPinPrices = Object.values(localPrices)
 
   return (
     <div>
@@ -259,7 +264,6 @@ function Cart(props: CartProps) {
           )}
         </Col>
       </Row>
-
       <div
         className="text-right"
         style={{
@@ -287,8 +291,20 @@ function Cart(props: CartProps) {
             {names.map((name, i) => (
               <tr>
                 <td>{name}</td>
-                {pinPrices[i].map(({ price }) => {
-                  return <td>{price}</td>
+                {pinPrices[i].map(({ price }, index) => {
+                  let isPriceChanged = 0
+                  if (Object.keys(oldPinPrices).length) {
+                    isPriceChanged =
+                      parseInt(oldPinPrices[i][index].price) - parseInt(price)
+                    if (isPriceChanged) {
+                      writeStorage('oldPrices', prices)
+                    }
+                  }
+                  return (
+                    <td className={isPriceChanged ? 'bg-info' : ''}>
+                      {price}
+                    </td>
+                  )
                 })}
                 {Array.from({ length: totalLen - pinPrices[i].length }).map(
                   _ => (
