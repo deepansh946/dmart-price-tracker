@@ -1,4 +1,4 @@
-import { useState, FormEvent, useEffect } from 'react'
+import { Children, useState, FormEvent, useEffect } from 'react'
 import TableExport from 'tableexport'
 import { Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
 import DeleteIcon from '@material-ui/icons/Delete'
@@ -105,7 +105,10 @@ function Cart(props: CartProps) {
     setLoading(false)
   }
 
-  const deleteHandler: (arg0: string) => void = (slug: string) => {
+  const deleteHandler: (arg0: string, arg1: string) => void = (
+    slug: string,
+    name: string
+  ) => {
     const filteredList = list[cart].filter((item: Item) => item.slug !== slug)
     const updatedList = {
       ...list,
@@ -113,6 +116,13 @@ function Cart(props: CartProps) {
     }
     setList(updatedList)
     writeStorage('list', updatedList)
+    const productNames = Object.keys(localPrices)
+    productNames.forEach(product => {
+      if (product.includes(name.trim())) {
+        delete localPrices[product]
+      }
+    })
+    writeStorage('oldPrices', localPrices)
   }
 
   const addHandler: () => void = () => {
@@ -151,11 +161,16 @@ function Cart(props: CartProps) {
     }
     setList(newList)
     writeStorage('list', newList)
+    writeStorage('oldPrices', {})
     setListItem('')
   }
 
   const importHandler = () => {
     document.getElementById('hiddenFileInput')?.click()
+  }
+
+  const syncHandler = () => {
+    writeStorage('oldPrices', prices)
   }
 
   const names = Object.keys(prices)
@@ -191,6 +206,12 @@ function Cart(props: CartProps) {
           >
             Import
           </Button>
+          <Button
+            className="btn-light mt-4 ml-2"
+            onClick={() => syncHandler()}
+          >
+            Sync
+          </Button>
           <input
             type="file"
             style={{ display: 'none' }}
@@ -219,18 +240,17 @@ function Cart(props: CartProps) {
       >
         <Col md={12}>
           <ListGroup className="">
-            {list[cart]?.map(({ name, slug }: ListItem) => (
-              <ListGroup.Item
-                key={slug}
-                className="d-flex justify-content-between"
-              >
-                <div>{name}</div>
-                <DeleteIcon
-                  className="cursor-pointer"
-                  onClick={() => deleteHandler(slug)}
-                />
-              </ListGroup.Item>
-            ))}
+            {Children.toArray(
+              list[cart]?.map(({ name, slug }: ListItem) => (
+                <ListGroup.Item className="d-flex justify-content-between">
+                  <div>{name}</div>
+                  <DeleteIcon
+                    className="cursor-pointer"
+                    onClick={() => deleteHandler(slug, name)}
+                  />
+                </ListGroup.Item>
+              ))
+            )}
           </ListGroup>
         </Col>
       </Row>
@@ -282,37 +302,40 @@ function Cart(props: CartProps) {
           <thead>
             <tr>
               <th>Name</th>
-              {PINS.map(code => (
-                <th>{code}</th>
-              ))}
+              {Children.toArray(PINS.map(code => <th>{code}</th>))}
             </tr>
           </thead>
           <tbody>
-            {names.map((name, i) => (
-              <tr>
-                <td>{name}</td>
-                {pinPrices[i].map(({ price }, index) => {
-                  let isPriceChanged = 0
-                  if (Object.keys(oldPinPrices).length) {
-                    isPriceChanged =
-                      parseInt(oldPinPrices[i][index].price) - parseInt(price)
-                    if (isPriceChanged) {
-                      writeStorage('oldPrices', prices)
-                    }
-                  }
-                  return (
-                    <td className={isPriceChanged ? 'bg-info' : ''}>
-                      {price}
-                    </td>
-                  )
-                })}
-                {Array.from({ length: totalLen - pinPrices[i].length }).map(
-                  _ => (
-                    <td>NA</td>
-                  )
-                )}
-              </tr>
-            ))}
+            {Children.toArray(
+              names.map((name, i) => (
+                <tr>
+                  <td>{name}</td>
+                  {Children.toArray(
+                    pinPrices[i].map(({ price }, index) => {
+                      let isPriceChanged = 0
+                      if (
+                        Object.keys(oldPinPrices).length &&
+                        oldPinPrices[i][index]?.price
+                      ) {
+                        isPriceChanged =
+                          parseInt(oldPinPrices[i][index].price) -
+                          parseInt(price)
+                      }
+                      return (
+                        <td className={isPriceChanged ? 'bg-info' : ''}>
+                          {price}
+                        </td>
+                      )
+                    })
+                  )}
+                  {Children.toArray(
+                    Array.from({
+                      length: totalLen - pinPrices[i].length,
+                    }).map(_ => <td>NA</td>)
+                  )}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

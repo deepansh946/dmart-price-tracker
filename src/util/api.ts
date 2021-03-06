@@ -8,7 +8,7 @@ export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
     for (const { storeId, code } of PIN_CODES) {
       let prices = {}
 
-      for (const { slug } of list) {
+      for (const { slug, name } of list) {
         const url = API_URL + slug
         const {
           data: {
@@ -28,10 +28,12 @@ export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
           },
         })
         if (sKUs) {
-          const data = sKUs.map(({ priceSALE: price, name }: DmartAPIRes) => ({
-            name,
-            price,
-          }))
+          const data = sKUs.map(
+            ({ priceSALE: price, name: dmartName }: DmartAPIRes) => ({
+              name: (name + dmartName.split(':')[1]).trim(),
+              price,
+            })
+          )
           prices = {
             ...prices,
             [slug]: data,
