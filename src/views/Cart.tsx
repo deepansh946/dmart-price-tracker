@@ -30,7 +30,7 @@ function Cart(props: CartProps) {
 
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
   const [localList] = useLocalStorage<ListItem>('list', {})
-  const [localPrices] = useLocalStorage<ListItem>('oldPrices', {})
+  const [localPrices] = useLocalStorage<ListItem>(`${cart} prices`, {})
   const [listItem, setListItem] = useState<string>('')
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
@@ -97,7 +97,7 @@ function Cart(props: CartProps) {
       const data = await requestPrice(list[cart])
       setPrices(data)
       if (!Object.keys(localPrices).length) {
-        writeStorage('oldPrices', data)
+        writeStorage(`${cart} prices`, data)
       }
     } catch (err) {
       alert('Something went wrong! Try after sometime.')
@@ -122,7 +122,7 @@ function Cart(props: CartProps) {
         delete localPrices[product]
       }
     })
-    writeStorage('oldPrices', localPrices)
+    writeStorage(`${cart} prices`, localPrices)
   }
 
   const addHandler: () => void = () => {
@@ -161,7 +161,7 @@ function Cart(props: CartProps) {
     }
     setList(newList)
     writeStorage('list', newList)
-    writeStorage('oldPrices', {})
+    writeStorage(`${cart} prices`, {})
     setListItem('')
   }
 
@@ -170,7 +170,7 @@ function Cart(props: CartProps) {
   }
 
   const syncHandler = () => {
-    writeStorage('oldPrices', prices)
+    writeStorage(`${cart} prices`, prices)
   }
 
   const names = Object.keys(prices)
