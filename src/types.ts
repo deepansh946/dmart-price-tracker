@@ -15,8 +15,9 @@ type Price = {
   price: string
 }
 
-export type PincodesArr = {
-  pin: string
+export interface PinCodes {
+  code: string
+  storeId: string
 }
 
 export type PriceArr = {

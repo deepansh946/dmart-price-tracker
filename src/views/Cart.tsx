@@ -1,12 +1,19 @@
 import { Children, useState, FormEvent, useEffect } from 'react'
 import TableExport from 'tableexport'
-import { Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
-import DeleteIcon from '@material-ui/icons/Delete'
+import { Badge, Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
+import { Clear as ClearIcon, Delete as DeleteIcon } from '@material-ui/icons'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
 
 import { requestPrice } from '../util/api'
-import { CartProps, ListItem, getKeyValue, Item, PriceArr } from '../types'
-import { PINS } from '../resources/constants'
+import {
+  CartProps,
+  ListItem,
+  getKeyValue,
+  Item,
+  PriceArr,
+  PinCodes,
+} from '../types'
+import { PIN_CODES } from '../resources/constants'
 
 const capitalize = (string: string) => {
   return string[0].toUpperCase() + string.slice(1).toLowerCase()
@@ -29,6 +36,7 @@ function Cart(props: CartProps) {
   } = props
 
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
+  const [pinCodes, setPinCodes] = useState<PinCodes[]>(PIN_CODES)
   const [localList] = useLocalStorage<ListItem>('list', {})
   const [localPrices] = useLocalStorage<ListItem>(`${cart} prices`, {})
   const [listItem, setListItem] = useState<string>('')
@@ -94,7 +102,7 @@ function Cart(props: CartProps) {
   const submitHandler: () => void = async () => {
     try {
       setLoading(true)
-      const data = await requestPrice(list[cart])
+      const data = await requestPrice(list[cart], pinCodes)
       setPrices(data)
       if (!Object.keys(localPrices).length) {
         writeStorage(`${cart} prices`, data)
@@ -150,7 +158,7 @@ function Cart(props: CartProps) {
       writeStorage('list', newList)
       setListItem('')
     } else {
-      alert('Kuch toh likh be!')
+      alert('Please enter a valid link.')
     }
   }
 
@@ -175,7 +183,7 @@ function Cart(props: CartProps) {
 
   const names = Object.keys(prices)
   const pinPrices = Object.values(prices)
-  const totalLen = PINS.length
+  const totalLen = pinCodes.length
   const oldPinPrices = Object.values(localPrices)
 
   return (
@@ -232,6 +240,27 @@ function Cart(props: CartProps) {
           />
         </Col>
       </Row>
+      <Row className="p-4 mx-auto">
+        <Col md={12}>
+          <h2>Pin Codes</h2>
+          {Children.toArray(
+            pinCodes.map(({ code }, index) => (
+              <Badge pill variant="success" className="pincode mr-2 p-2">
+                {code}
+                <ClearIcon
+                  className="cursor-pointer pincode"
+                  onClick={() => {
+                    const newPinCodes = pinCodes.filter(
+                      pin => pin.code !== code
+                    )
+                    setPinCodes([...newPinCodes])
+                  }}
+                />
+              </Badge>
+            ))
+          )}
+        </Col>
+      </Row>
       <Row
         className="p-4 mx-auto"
         style={{
@@ -239,7 +268,7 @@ function Cart(props: CartProps) {
         }}
       >
         <Col md={12}>
-          <ListGroup className="">
+          <ListGroup>
             {Children.toArray(
               list[cart]?.map(({ name, slug }: ListItem) => (
                 <ListGroup.Item className="d-flex justify-content-between">
@@ -302,7 +331,7 @@ function Cart(props: CartProps) {
           <thead>
             <tr>
               <th>Name</th>
-              {Children.toArray(PINS.map(code => <th>{code}</th>))}
+              {Children.toArray(pinCodes.map(({ code }) => <th>{code}</th>))}
             </tr>
           </thead>
           <tbody>

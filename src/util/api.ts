@@ -1,11 +1,14 @@
 import { API_URL, PIN_CODES } from '../resources/constants'
 import axios from 'axios'
-import { DmartAPIRes, PriceArr, Item, getKeyValue } from '../types'
+import { DmartAPIRes, PriceArr, Item, getKeyValue, PinCodes } from '../types'
 
-export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
+export const requestPrice = async (
+  list: Item[],
+  pinCodes: PinCodes[]
+): Promise<PriceArr> => {
   try {
     let pricesWithPincodes = {}
-    for (const { storeId, code } of PIN_CODES) {
+    for (const { storeId, code } of pinCodes) {
       let prices = {}
 
       for (const { slug, name } of list) {
@@ -49,7 +52,7 @@ export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
 
     let excelFormat = {} as any
 
-    const pinCodes = Object.keys(pricesWithPincodes)
+    const pins = Object.keys(pricesWithPincodes)
 
     const temp = Object.values(pricesWithPincodes)
 
@@ -66,7 +69,7 @@ export const requestPrice = async (list: Item[]): Promise<PriceArr> => {
                 ? getKeyValue(excelFormat, name)
                 : []),
               {
-                pin: pinCodes[index],
+                pin: pins[index],
                 price,
               },
             ],

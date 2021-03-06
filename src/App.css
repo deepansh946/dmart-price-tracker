@@ -62,3 +62,7 @@ a:hover {
 .tableexport-caption {
   display: none;
 }
+
+.pincode {
+  font-size: 16px !important;
+}
