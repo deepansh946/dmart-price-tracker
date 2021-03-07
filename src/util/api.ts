@@ -1,4 +1,4 @@
-import { API_URL, PIN_CODES } from '../resources/constants'
+import { API_URL } from '../resources/constants'
 import axios from 'axios'
 import { DmartAPIRes, PriceArr, Item, getKeyValue, PinCodes } from '../types'
 
