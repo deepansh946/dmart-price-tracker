@@ -1,10 +1,7 @@
 import { Children, useState, FormEvent, useEffect } from 'react'
 import TableExport from 'tableexport'
 import { Badge, Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
-import {
-  Clear as ClearIcon,
-  Delete as DeleteIcon,
-} from '@material-ui/icons'
+import { Clear as ClearIcon, Delete as DeleteIcon } from '@material-ui/icons'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
 
 import { requestPrice } from '../util/api'
@@ -101,6 +98,7 @@ function Cart(props: CartProps) {
       setList(newList)
       writeStorage('list', newList)
     }
+    // eslint-disable-next-line
   }, [text])
 
   const submitHandler: () => void = async () => {
