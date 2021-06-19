@@ -35,6 +35,12 @@ export type AddModalProps = {
   onConfirm: (arg0: string) => void
 }
 
+export type AddPinCodeProps = {
+  show: Boolean
+  setModal: Dispatch<SetStateAction<boolean>>
+  onConfirm: (arg0: string, arg1: string) => void
+}
+
 interface MatchParams {
   cart: string
 }

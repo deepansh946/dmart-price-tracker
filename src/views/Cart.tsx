@@ -1,7 +1,10 @@
 import { Children, useState, FormEvent, useEffect } from 'react'
 import TableExport from 'tableexport'
 import { Badge, Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
-import { Clear as ClearIcon, Delete as DeleteIcon } from '@material-ui/icons'
+import {
+  Clear as ClearIcon,
+  Delete as DeleteIcon,
+} from '@material-ui/icons'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
 
 import { requestPrice } from '../util/api'
@@ -35,10 +38,12 @@ function Cart(props: CartProps) {
     },
   } = props
 
-  const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
-  const [pinCodes, setPinCodes] = useState<PinCodes[]>(PIN_CODES)
+  const [localPincodes] = useLocalStorage<PinCodes[]>('pinCodes', PIN_CODES)
   const [localList] = useLocalStorage<ListItem>('list', {})
   const [localPrices] = useLocalStorage<ListItem>(`${cart} prices`, {})
+
+  const [pinCodes, setPinCodes] = useState<PinCodes[]>(localPincodes)
+  const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
   const [listItem, setListItem] = useState<string>('')
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
@@ -96,7 +101,6 @@ function Cart(props: CartProps) {
       setList(newList)
       writeStorage('list', newList)
     }
-    // eslint-disable-next-line
   }, [text])
 
   const submitHandler: () => void = async () => {
@@ -181,6 +185,12 @@ function Cart(props: CartProps) {
     writeStorage(`${cart} prices`, prices)
   }
 
+  const deletePinCode: (code: string) => void = code => {
+    const newPinCodes = pinCodes.filter(pin => pin.code !== code)
+    setPinCodes([...newPinCodes])
+    writeStorage('pinCodes', newPinCodes)
+  }
+
   const names = Object.keys(prices)
   const pinPrices = Object.values(prices)
   const totalLen = pinCodes.length
@@ -214,10 +224,7 @@ function Cart(props: CartProps) {
           >
             Import
           </Button>
-          <Button
-            className="btn-light mt-4 ml-2"
-            onClick={() => syncHandler()}
-          >
+          <Button className="btn-light mt-4 ml-2" onClick={() => syncHandler()}>
             Sync
           </Button>
           <input
@@ -244,16 +251,13 @@ function Cart(props: CartProps) {
         <Col md={12}>
           <h2>Pin Codes</h2>
           {Children.toArray(
-            pinCodes.map(({ code }, index) => (
+            pinCodes.map(({ code }) => (
               <Badge pill variant="success" className="pincode mr-2 p-2">
                 {code}
                 <ClearIcon
                   className="cursor-pointer pincode"
                   onClick={() => {
-                    const newPinCodes = pinCodes.filter(
-                      pin => pin.code !== code
-                    )
-                    setPinCodes([...newPinCodes])
+                    deletePinCode(code)
                   }}
                 />
               </Badge>
