@@ -3,6 +3,7 @@ import TableExport from 'tableexport'
 import { Badge, Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
 import { Clear as ClearIcon, Delete as DeleteIcon } from '@material-ui/icons'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
+import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 import { requestPrice } from '../util/api'
 import {
@@ -198,6 +199,18 @@ function Cart(props: CartProps) {
     <div>
       <div className="my-3 text-center">
         <h2>{cart}</h2>
+      </div>
+      <div className="mx-3 text-right">
+        <BootstrapSwitchButton
+          style="ml-2 mt-4"
+          checked={true}
+          onlabel="Dmart"
+          offlabel="Others"
+          onChange={(checked: boolean) => {
+            console.log(checked)
+          }}
+          width={100}
+        />
       </div>
       <Row className="p-4 mx-auto">
         <Col md={6}>
