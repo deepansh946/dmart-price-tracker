@@ -1,7 +1,6 @@
 import { API_URL } from '../resources/constants'
 import axios from 'axios'
 import { DmartAPIRes, PriceArr, Item, getKeyValue, PinCodes } from '../types'
-import { PREFIX_LINKS } from '../resources/constants'
 
 export const requestOtherPrices = async (list: any) => {
   try {

@@ -38,7 +38,6 @@ function Cart(props: CartProps) {
   const [localPincodes] = useLocalStorage<PinCodes[]>('pinCodes', PIN_CODES)
   const [localList] = useLocalStorage<ListItem>('list', {})
   const [localPrices] = useLocalStorage<ListItem>(`${cart} prices`, {})
-  const [localToggle] = useLocalStorage<boolean>('toggle', true)
 
   const [pinCodes, setPinCodes] = useState<PinCodes[]>(localPincodes)
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
@@ -46,7 +45,6 @@ function Cart(props: CartProps) {
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
   const [text, setText] = useState<string>()
-  const [toggle, setToggle] = useState<boolean>(localToggle)
 
   const exportTableToExcel = () => {
     const selector = document.querySelectorAll('#priceTable')
@@ -189,11 +187,6 @@ function Cart(props: CartProps) {
     const newPinCodes = pinCodes.filter(pin => pin.code !== code)
     setPinCodes([...newPinCodes])
     writeStorage('pinCodes', newPinCodes)
-  }
-
-  const updateToggle: (checked: boolean) => void = checked => {
-    setToggle(checked)
-    writeStorage('toggle', checked)
   }
 
   const names = Object.keys(prices)
