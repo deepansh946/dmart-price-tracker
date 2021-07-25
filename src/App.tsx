@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 import Routes from './routes'
 import './App.css'
 import Footer from './components/Footer'
+
+axios.defaults.baseURL = process.env.REACT_APP_BASE_URL
 
 const App = (): JSX.Element => {
   return (

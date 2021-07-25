@@ -3,7 +3,6 @@ import TableExport from 'tableexport'
 import { Badge, Row, Col, Button, Spinner, ListGroup } from 'react-bootstrap'
 import { Clear as ClearIcon, Delete as DeleteIcon } from '@material-ui/icons'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
-import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 import { requestPrice } from '../util/api'
 import {
@@ -39,6 +38,7 @@ function Cart(props: CartProps) {
   const [localPincodes] = useLocalStorage<PinCodes[]>('pinCodes', PIN_CODES)
   const [localList] = useLocalStorage<ListItem>('list', {})
   const [localPrices] = useLocalStorage<ListItem>(`${cart} prices`, {})
+  const [localToggle] = useLocalStorage<boolean>('toggle', true)
 
   const [pinCodes, setPinCodes] = useState<PinCodes[]>(localPincodes)
   const [prices, setPrices] = useState<PriceArr>(DEFAULT_PRICES)
@@ -46,6 +46,7 @@ function Cart(props: CartProps) {
   const [list, setList] = useState<ListItem>(localList)
   const [loading, setLoading] = useState<boolean>(false)
   const [text, setText] = useState<string>()
+  const [toggle, setToggle] = useState<boolean>(localToggle)
 
   const exportTableToExcel = () => {
     const selector = document.querySelectorAll('#priceTable')
@@ -190,6 +191,11 @@ function Cart(props: CartProps) {
     writeStorage('pinCodes', newPinCodes)
   }
 
+  const updateToggle: (checked: boolean) => void = checked => {
+    setToggle(checked)
+    writeStorage('toggle', checked)
+  }
+
   const names = Object.keys(prices)
   const pinPrices = Object.values(prices)
   const totalLen = pinCodes.length
@@ -199,18 +205,6 @@ function Cart(props: CartProps) {
     <div>
       <div className="my-3 text-center">
         <h2>{cart}</h2>
-      </div>
-      <div className="mx-3 text-right">
-        <BootstrapSwitchButton
-          style="ml-2 mt-4"
-          checked={true}
-          onlabel="Dmart"
-          offlabel="Others"
-          onChange={(checked: boolean) => {
-            console.log(checked)
-          }}
-          width={100}
-        />
       </div>
       <Row className="p-4 mx-auto">
         <Col md={6}>

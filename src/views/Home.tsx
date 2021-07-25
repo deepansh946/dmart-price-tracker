@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, Children } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Row, Col } from 'react-bootstrap'
+import { Dropdown, Row, Col } from 'react-bootstrap'
 import { writeStorage, useLocalStorage } from '@rehooks/local-storage'
 import {
   Clear as ClearIcon,
@@ -61,15 +61,31 @@ const Home = (props: RouteComponentProps): JSX.Element => {
             />
           </h4>
           <div className="d-flex align-items-center justify-content-center">
-            {carts.map(cart => (
-              <div
-                key={cart}
-                className="badge badge-success p-3 ml-2 font-18 cursor-pointer"
-                onClick={() => history.push(cart)}
-              >
-                {cart}
-              </div>
-            ))}
+            {Children.toArray(
+              carts.map(cart => (
+                <Dropdown>
+                  <Dropdown.Toggle
+                    variant="success"
+                    id="dropdown-basic"
+                    className="ml-2"
+                  >
+                    <div
+                      className="badge badge-success ml-2 font-18 cursor-pointer"
+                      onClick={() => history.push(cart)}
+                    >
+                      {cart}
+                    </div>
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu>
+                    <Dropdown.Item href={`dmart/${cart}`}>Dmart</Dropdown.Item>
+                    <Dropdown.Item href={`others/${cart}`}>
+                      Others
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              ))
+            )}
           </div>
         </Col>
       </Row>

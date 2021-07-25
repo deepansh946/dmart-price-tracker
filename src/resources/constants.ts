@@ -44,3 +44,10 @@ export const SOCIAL_LINKS = [
   'https://www.linkedin.com/in/deepansh946/',
   'https://twitter.com/deepansh946',
 ]
+
+export const PREFIX_LINKS = {
+  amazon: 'https://www.amazon.in/',
+  flipkart: 'https://www.flipkart.com/',
+  bigBasket: 'https://bigbasket.com/',
+  grofers: 'https://grofers.com/',
+}
