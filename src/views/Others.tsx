@@ -27,7 +27,7 @@ function Cart(props: CartProps) {
   const [loading, setLoading] = useState<boolean>(false)
 
   const exportTableToExcel = () => {
-    const selector = document.querySelectorAll('#priceTable')
+    const selector = document.querySelectorAll('#otherPriceTable')
     const table = new TableExport.TableExport(selector, {
       headers: true,
       footers: true,
@@ -41,7 +41,7 @@ function Cart(props: CartProps) {
       sheetname: 'id',
     })
     const exportData: any = table.getExportData()
-    const xlsxData = exportData.priceTable.xlsx // Replace with the kind of file you want from the exportData
+    const xlsxData = exportData.otherPriceTable.xlsx // Replace with the kind of file you want from the exportData
     table.export2file(
       xlsxData.data,
       xlsxData.mimeType,
@@ -149,7 +149,10 @@ function Cart(props: CartProps) {
             {Children.toArray(
               list['amazon']?.map((name: string, i: number) => {
                 return (
-                  <ListGroup.Item className="d-flex justify-content-between">
+                  <ListGroup.Item
+                    className="d-flex justify-content-between"
+                    key={name}
+                  >
                     <div>{name}</div>
                     <DeleteIcon
                       className="cursor-pointer"
@@ -206,17 +209,19 @@ function Cart(props: CartProps) {
         </Button>
       </div>
       <div className="p-4">
-        <table className="table table-striped" id="priceTable">
+        <table className="table table-striped" id="otherPriceTable">
           <thead>
-            <th>Product</th>
-            <th>BigBasket</th>
-            <th>Flipkart</th>
-            <th>Grofers</th>
+            <tr>
+              <th>Product</th>
+              <th>BigBasket</th>
+              <th>Flipkart</th>
+              <th>Grofers</th>
+            </tr>
           </thead>
           <tbody>
             {list['amazon']?.map((name: string, i: number) => {
               return (
-                <tr>
+                <tr key={name}>
                   <th>{name}</th>
                   <th>{prices['bigBasket']?.[i]}</th>
                   <th>{prices['flipkart']?.[i]}</th>
