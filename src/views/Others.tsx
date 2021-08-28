@@ -147,8 +147,7 @@ function Cart(props: CartProps) {
         <Col md={12}>
           <ListGroup>
             {Children.toArray(
-              list['amazon']?.map((link: string, i: number) => {
-                const name = link.split('/')[0].replaceAll('-', ' ')
+              list['amazon']?.map((name: string, i: number) => {
                 return (
                   <ListGroup.Item className="d-flex justify-content-between">
                     <div>{name}</div>
@@ -210,14 +209,12 @@ function Cart(props: CartProps) {
         <table className="table table-striped" id="priceTable">
           <thead>
             <th>Product</th>
-            {/* <th>Amazon</th> */}
             <th>BigBasket</th>
             <th>Flipkart</th>
             <th>Grofers</th>
           </thead>
           <tbody>
-            {list['amazon']?.map((link: string, i: number) => {
-              const name = link.split('/')[0].replaceAll('-', ' ')
+            {list['amazon']?.map((name: string, i: number) => {
               return (
                 <tr>
                   <th>{name}</th>
