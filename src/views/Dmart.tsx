@@ -35,7 +35,10 @@ function Cart(props: CartProps) {
     },
   } = props
 
-  const [localPincodes] = useLocalStorage<PinCodes[]>('pinCodes', PIN_CODES)
+  const [localPincodes] = useLocalStorage<PinCodes[]>(
+    'dmart pinCodes',
+    PIN_CODES
+  )
   const [localList] = useLocalStorage<ListItem>('list', {})
   const [localPrices] = useLocalStorage<ListItem>(`${cart} prices`, {})
 

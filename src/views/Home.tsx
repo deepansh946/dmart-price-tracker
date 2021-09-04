@@ -16,9 +16,18 @@ import { PIN_CODES } from '../resources/constants'
 const Home = (props: RouteComponentProps): JSX.Element => {
   const { history } = props
   const [localCart] = useLocalStorage<string[]>('carts', [])
-  const [localPincodes] = useLocalStorage<PinCodes[]>('pinCodes', PIN_CODES)
+  const [dmartPincodes] = useLocalStorage<PinCodes[]>(
+    'dmart pinCodes',
+    PIN_CODES
+  )
+  const [otherPincodes] = useLocalStorage<PinCodes[]>(
+    'other pinCodes',
+    PIN_CODES
+  )
   const [carts, setCarts] = useState(localCart)
-  const [pinCodes, setPinCodes] = useState(localPincodes)
+  const [dPinCodes, setDPinCodes] = useState(dmartPincodes)
+  const [oPinCodes, setOPinCodes] = useState(otherPincodes)
+  const [isDmart, setIsDmart] = useState(true)
 
   const [show, setShow] = useState<boolean>(false)
   const [showPinCodeModal, togglePinCodeModal] = useState<boolean>(false)
@@ -33,20 +42,37 @@ const Home = (props: RouteComponentProps): JSX.Element => {
     code,
     storeId
   ) => {
-    const updatedPinCodes = [...pinCodes, { code, storeId }]
-    setPinCodes(updatedPinCodes)
-    writeStorage('pinCodes', updatedPinCodes)
+    if (isDmart) {
+      const updatedPinCodes = [...dPinCodes, { code, storeId }]
+      setDPinCodes(updatedPinCodes)
+      writeStorage('dmart pinCodes', updatedPinCodes)
+    } else {
+      const updatedPinCodes = [...oPinCodes, { code, storeId }]
+      setOPinCodes(updatedPinCodes)
+      writeStorage('other pinCodes', updatedPinCodes)
+    }
   }
 
-  const deletePinCode: (code: string) => void = code => {
-    const updatedPinCodes = pinCodes.filter(pin => pin.code !== code)
-    setPinCodes([...updatedPinCodes])
-    writeStorage('pinCodes', updatedPinCodes)
+  const deletePinCode: (code: string, isDmart: Boolean) => void = (
+    code,
+    isDmart
+  ) => {
+    if (isDmart) {
+      const updatedPinCodes = dPinCodes.filter(pin => pin.code !== code)
+      setDPinCodes([...updatedPinCodes])
+      writeStorage('dmart pinCodes', updatedPinCodes)
+    } else {
+      const updatedPinCodes = oPinCodes.filter(pin => pin.code !== code)
+      setOPinCodes([...updatedPinCodes])
+      writeStorage('other pinCodes', updatedPinCodes)
+    }
   }
 
   const undoPinCodes = () => {
-    setPinCodes(PIN_CODES)
-    writeStorage('pinCodes', PIN_CODES)
+    setDPinCodes(PIN_CODES)
+    setOPinCodes(PIN_CODES)
+    writeStorage('other pinCodes', PIN_CODES)
+    writeStorage('dmart pinCodes', PIN_CODES)
   }
 
   return (
@@ -92,10 +118,13 @@ const Home = (props: RouteComponentProps): JSX.Element => {
       <Row className="p-4 mx-auto">
         <Col md={12}>
           <h4 className="text-center mb-3">
-            Pin Codes
+            Dmart Pin Codes
             <AddIcon
               className="ml-2 mb-1 cursor-pointer"
-              onClick={() => togglePinCodeModal(true)}
+              onClick={() => {
+                togglePinCodeModal(true)
+                setIsDmart(true)
+              }}
             />
             <UndoIcon
               className="ml-2 mb-1 cursor-pointer"
@@ -103,12 +132,42 @@ const Home = (props: RouteComponentProps): JSX.Element => {
             />
           </h4>
           <div className="d-flex align-items-center justify-content-center">
-            {pinCodes.map(({ code }) => (
+            {dPinCodes.map(({ code }) => (
               <div key={code} className="badge badge-success p-3 ml-2 font-18">
                 {code}
                 <ClearIcon
                   className="cursor-pointer pincode"
-                  onClick={() => deletePinCode(code)}
+                  onClick={() => deletePinCode(code, true)}
+                />
+              </div>
+            ))}
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="p-4 mx-auto">
+        <Col md={12}>
+          <h4 className="text-center mb-3">
+            Other Pin Codes
+            <AddIcon
+              className="ml-2 mb-1 cursor-pointer"
+              onClick={() => {
+                togglePinCodeModal(true)
+                setIsDmart(false)
+              }}
+            />
+            <UndoIcon
+              className="ml-2 mb-1 cursor-pointer"
+              onClick={() => undoPinCodes()}
+            />
+          </h4>
+          <div className="d-flex align-items-center justify-content-center">
+            {oPinCodes.map(({ code }) => (
+              <div key={code} className="badge badge-success p-3 ml-2 font-18">
+                {code}
+                <ClearIcon
+                  className="cursor-pointer pincode"
+                  onClick={() => deletePinCode(code, false)}
                 />
               </div>
             ))}
